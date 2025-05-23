@@ -1,4 +1,4 @@
-#!/Users/ashish.dwivedi/Downloads/khoj-fastapi-lite/venv/bin/python3.10
+#!/Users/ashish.dwivedi/Downloads/khoj-backend/venv/bin/python3.10
 # -*- coding: utf-8 -*-
 import re
 import sys
