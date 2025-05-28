@@ -61,6 +61,16 @@ class ConversationService:
             yield "Error: No default chat model configured"
             return
             
+        # Load agent 4 if no agent provided
+        if not agent:
+            try:
+                agent = adapters.get_agent(self.db, 4)  # Hardcode your agent ID here
+                if not agent:
+                    logger.warning("Agent ID 4 not found, proceeding without agent")
+            except Exception as e:
+                logger.warning(f"Could not load agent ID 4: {e}")
+                agent = None
+        
         # Use agent's chat model if agent is provided
         if agent and agent.chat_model:
             chat_model = agent.chat_model
@@ -89,6 +99,7 @@ class ConversationService:
             ):
                 response_text += chunk
                 yield chunk
+                await asyncio.sleep(0)
                 
         except Exception as e:
             logger.error(f"Error generating response: {e}")
@@ -105,7 +116,7 @@ class ConversationService:
                 khoj_message=response_text,
                 user_message_metadata=json.dumps({"timestamp": datetime.now().isoformat()}),
                 khoj_message_metadata=json.dumps({
-                    "agent_id": agent.id if agent else None,
+                    "agent_id": agent.id if agent else '4',
                     "chat_model_id": chat_model.id,
                     "timestamp": datetime.now().isoformat()
                 })
@@ -161,6 +172,7 @@ class ConversationService:
                 async for chunk in response:
                     if chunk.text:
                         yield chunk.text
+                        await asyncio.sleep(0)
                         
             except Exception as api_error:
                 error_str = str(api_error)

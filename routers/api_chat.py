@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from typing import Dict, List, Optional, Union
 import json
 import uuid
+import asyncio
 from datetime import datetime
 
 from database import models, schemas, adapters
@@ -128,6 +129,7 @@ async def send_message(
                 agent
             ):
                 yield f"data: {json.dumps({'message': chunk})}\n\n"
+                await asyncio.sleep(0)
         except Exception as e:
             yield f"data: {json.dumps({'error': str(e)})}\n\n"
         finally:
@@ -135,10 +137,11 @@ async def send_message(
     
     return StreamingResponse(
         generate_response(),
-        media_type="text/plain",
+        media_type="text/event-stream",
         headers={
             "Cache-Control": "no-cache",
             "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",  # Disable proxy buffering
         }
     )
 
